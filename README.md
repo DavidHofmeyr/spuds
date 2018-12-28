@@ -1,5 +1,6 @@
 # spuds
 ## A spectral clustering algorithm based on low density separation
+### To install from within R console:
 
 if(!("devtools"%in%installed.packages())) install.packages("devtools")
 
