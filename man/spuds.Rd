@@ -9,7 +9,7 @@ spuds(X, c0, scale, sigmult, cplus, cmax, lam, gam, intr)
 }
 \arguments{
   \item{X}{a numeric matrix (num_data x num_dimensions); the dataset to be clustered.}
-  \item{c0}{the initial number of clusters.}
+  \item{c0}{(optional) the initial number of clusters. Default is 20.}
   \item{scale}{(optional) either a numeric value for the scale parameter or a function taking as input the data matrix and which returns a scalar.
 Default is the square root of the average of the first k
 eigenvalues (evals) of the covariance, multiplied by (4/(2+k)/n)^(1/(k+4)).
