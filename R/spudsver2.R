@@ -14,7 +14,7 @@ squaredists <- function(X){
   C
 }
 
-##### kmeans++ variant for clustering embedded data. Encourages cluster means far from the overall mean
+##### kmeans++ variant for clustering embedded data. Encourages initial centroids far from the overall mean
 
 kmeanspp <- function(X, k, nstart){
   n <- nrow(X)
