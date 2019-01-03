@@ -242,12 +242,11 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
     #ixa <- inliers[which(matrix(ds[ix1, inliers], nrow = length(ix1))==min(ds[ix1, inliers])[1], arr.ind = TRUE)[1,2]]
     dclust <- sapply(1:max(sol), function(lb){
         dlb <- min(ds[ix1,which(sol==lb)])
-        if(dlb==0) Inf
+        if(dlb<(sig*1e-20)) Inf
         else dlb
       })
     laba <- which.min(dclust)
     sol[ix1] <- laba
-    print(sum(sol==lab))
     #sol[which(sol>outliers[1])] = sol[which(sol>outliers[1])] - 1
     sol[which(sol>lab)] = sol[which(sol>lab)] - 1
     #outliers <- which(table(sol)<=gam)
