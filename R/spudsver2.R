@@ -245,8 +245,8 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
         if(dlb==0) Inf
         else dlb
       })
-    ixa <- which.min(dclust)
-    sol[ix1] <- sol[ixa]
+    laba <- which.min(dclust)
+    sol[ix1] <- laba
     print(sum(sol==lab))
     #sol[which(sol>outliers[1])] = sol[which(sol>outliers[1])] - 1
     sol[which(sol>lab)] = sol[which(sol>lab)] - 1
