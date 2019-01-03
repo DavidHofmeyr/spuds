@@ -3,37 +3,7 @@
 
 norm_vec <- function(v) sqrt(sum(v^2))
 
-#### kmeans++ used to perform cluster assignment of embedded data
-
-kmeans2 = function(X, k, nstart){
-  solopt = numeric(nrow(X))
-  fopt = Inf
-  for(i in 1:nstart){
-    km = kmeanspp(X, k)
-    if(km$tot.withinss<fopt){
-      solopt = km$cluster
-      fopt = km$tot.withinss
-    }
-  }
-  solopt
-}
-
-kmeanspp = function(X, k){
-  n = nrow(X)
-  mn = colMeans(X)
-  ds = distmat(mn, X)
-  C = sample(1:n, 1, prob = ds^2)
-  for(i in 2:k){
-    dsnew = distmat(X[C[i-1],],X)
-    replace = which(dsnew<ds)
-    ds[replace] = dsnew[replace]
-    C = c(C, sample(1:n, 1, prob = ds^2))
-  }
-  kmeans(X, X[C,])
-}
-
-
-##### computes pairwise distances
+##### computes (squared) pairwise distances
 
 squaredists <- function(X){
   Xn <- rowSums(X^2)
@@ -68,16 +38,6 @@ is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
     if(sum(sol==sol[ix2])>gam) denthresh <- lam*min(max(den[ixs]), max(den[which(sol==sol[ix2])]))
     else denthresh <- Inf
     if(min(den[ix], den[ix2])>=denthresh){
-      #den.path <- numeric(8)
-      #ts <- seq(0, 1, length = 10)
-      #i = 2
-      #while(i <= 9){
-      #  x <- ts[i]*X[ix,]+(1-ts[i])*X[ix2,]
-      #  dts <- distmat(x, X)
-      #  den.path[i-1] <- sum(exp(-dts^2/2/sig^2))
-      #  if(den.path[i-1] < denthresh) i = 10
-      #  else i = i + 1
-      #}
       ts <- seq(.1, .9, length = 9)
       x.path <- ts%*%t(X[ix,]) + (1-ts)%*%t(X[ix2,])
       d.path <- distmat(x.path, X)
@@ -170,7 +130,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
   if(inherits(e, 'try-error')) e <- eigen(L)$vectors/sqrt(D)
 
   E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-  sol <- kmeans2(E, nclust, nstart = 10)
+  sol <- kmeans(E, nclust, nstart = 50)$cluster
 
   ## determine if all non-outlier clusters are separated
   separate <- TRUE
@@ -189,7 +149,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
       nclust <- nclust + cplus
       if(ncol(e)<nclust) e <- eigs_sym(L, min(n, nclust+5*cplus))$vectors/sqrt(D)
       E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-      temp <- kmeans2(E, nclust, nstart = 10)
+      temp <- kmeans(E, nclust, nstart = 50)$cluster
 
       if(nclust>cmax){
         sol <- temp
@@ -221,7 +181,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
     repeat{
       nclust <- nclust - 1
       E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-      sol <- kmeans2(E, nclust, nstart = 10)
+      sol <- kmeans(E, nclust, nstart = 50)$cluster
       separate <- TRUE
       for(i in 1:nclust){
         if(separate){
