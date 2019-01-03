@@ -20,9 +20,14 @@ kmeanspp <- function(X, k, nstart){
   n <- nrow(X)
   obj_opt <- Inf
   sol_opt <- list()
+  mn <- colMeans(X)
+  C0 <- which.min(distmat(mn, X))
+  ds0 <- distmat(X[C0,], X)
   for(it in 1:nstart){
-    C <- sample(1:n, 1)
-    ds <- distmat(X[C,], X)
+    #C <- sample(1:n, 1)
+    #ds <- distmat(X[C,], X)
+    C <- C0
+    ds <- ds0
     for(i in 2:k){
       C <- c(C, sample(1:n, 1, prob = ds^2/sum(ds^2)))
       drep <- distmat(X[C[i],], X)
@@ -62,10 +67,11 @@ is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
     if(sum(sol==sol[ix2])>gam) denthresh <- lam*min(max(den[ixs]), max(den[which(sol==sol[ix2])]))
     else denthresh <- Inf
     if(min(den[ix], den[ix2])>=denthresh){
-      ts <- seq(.1, .9, length = 9)
+      #ts <- seq(.1, .9, length = 9)
       #x.path <- ts%*%t(X[ix,]) + (1-ts)%*%t(X[ix2,])
       #d.path <- distmat(x.path, X)
       #den.path <- rowSums(exp(-d.path^2/2/sig^2))
+      ts <- c(.5, .4, .6, .3, .7, .2, .8, .1, .9)
       den.path <- numeric(length(ts))
       i <- 1
       while(i <= length(ts)){
