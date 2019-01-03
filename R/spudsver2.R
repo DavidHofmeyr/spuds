@@ -14,21 +14,22 @@ squaredists <- function(X){
   C
 }
 
-##### kmeans++ for clustering embedded data
+##### kmeans++ variant for clustering embedded data. Encourages cluster means far from the overall mean
 
 kmeanspp <- function(X, k, nstart){
   n <- nrow(X)
   obj_opt <- Inf
   sol_opt <- list()
   mn <- colMeans(X)
+  ds0 <- distmat(mn, X)
   for(it in 1:nstart){
-    C <- sample(1:n, 1, prob = distmat(mn, X)^2)
-    ds <- distmat(X[C,], X)
+    ds <- ds0
+    C <- sample(1:n, 1, prob = ds^2)
     for(i in 2:k){
-      C <- c(C, sample(1:n, 1, prob = ds^2/sum(ds^2)))
-      drep <- distmat(X[C[i],], X)
+      drep <- distmat(X[C[i-1],], X)
       wrep <- which(drep<ds)
       ds[wrep] <- drep[wrep]
+      C <- c(C, sample(1:n, 1, prob = ds^2))
     }
     sol <- kmeans(X, X[C,])
     if(sol$tot.withinss<obj_opt){
