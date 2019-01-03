@@ -49,7 +49,7 @@ kmeanspp <- function(X, k, nstart){
 # sig <- scale parameter
 # lam <- density height threshold parameter
 
-is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
+is.density.separated2 <- function(ds, den, ixs, X, sig, lam, sol, gam){
 
   ## establish complement of cluster
   ixs2 <- (1:nrow(X))[-ixs]
@@ -81,6 +81,41 @@ is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
   ## if no path is found return TRUE
   TRUE
 }
+
+
+is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
+
+  ## establish complement of cluster
+  ixs2 <- (1:nrow(X))[-ixs]
+
+  ## find boundary points of cluster
+  B <- ixs[unique(apply(rbind(c(), ds[ixs2,ixs]), 1, which.min))]
+
+  ## search over boundary points for path of relatively high density
+  for(ix in B){
+    ix2 <- ixs2[which.min(ds[ix,ixs2])]
+    if(sum(sol==sol[ix2])>gam) denthresh <- lam*min(max(den[ixs]), max(den[which(sol==sol[ix2])]))
+    else denthresh <- Inf
+    if(min(den[ix], den[ix2])>=denthresh){
+      ts <- seq(.1, .9, length = 9)
+      #ts <- c(.5, .45, .55, .4, .6, .35, .65, .3, .7, .25, .75, .2, .8, .15, .85, .1, .9, .05, .95)
+      #ts <- c(.5, .4, .6, .3, .7, .2, .8, .1, .9)
+      den.path <- numeric(length(ts))
+      i = 1
+      while(i <= length(ts)){
+        x <- ts[i]*X[ix,]+(1-ts[i])*X[ix2,]
+        dts <- distmat(x, X)
+        den.path[i] <- sum(exp(-dts^2/2/sig^2))
+        if(den.path[i] < denthresh) i = length(ts) + 1
+        else i = i + 1
+      }
+      if(min(den.path)>=denthresh) return(FALSE) ## a path is found
+    }
+  }
+  ## if no path is found return TRUE
+  TRUE
+}
+
 
 
 #### SPUDS(...): Automatic spectral clustering algorithm based on finding
