@@ -14,22 +14,6 @@ squaredists <- function(X){
   C
 }
 
-##### a simple deterministic kmeans initialisation
-
-kmeans2 <- function(X, k, nstart){
-  mn <- colMeans(X)
-  ds <- distmat(X, mn)
-  C <- which.max(ds)
-  ds <- distmat(X[C,], X)
-  for(i in 2:k){
-    C <- c(C, which.max(ds))
-    drep <- distmat(X[C[i],], X)
-    wix <- which(drep<ds)
-    ds[wix] <- drep[wix]
-  }
-  kmeans(X, t(t(X[C,])*.5+mn*.5))
-}
-
 #### is.density.separated(...): Determine if a cluster is
 #### separated from the remainder
 #### parameters:
@@ -146,7 +130,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
   if(inherits(e, 'try-error')) e <- eigen(L)$vectors/sqrt(D)
 
   E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-  sol <- kmeans2(E, nclust, nstart = 50)$cluster
+  sol <- kmeans(E, nclust, nstart = 10)$cluster
 
   ## determine if all non-outlier clusters are separated
   separate <- TRUE
@@ -165,7 +149,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
       nclust <- nclust + cplus
       if(ncol(e)<nclust) e <- eigs_sym(L, min(n, nclust+5*cplus))$vectors/sqrt(D)
       E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-      temp <- kmeans2(E, nclust, nstart = 50)$cluster
+      temp <- kmeans(E, nclust, nstart = 10)$cluster
 
       if(nclust>cmax){
         sol <- temp
@@ -197,7 +181,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
     repeat{
       nclust <- nclust - 1
       E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-      sol <- kmeans2(E, nclust, nstart = 50)$cluster
+      sol <- kmeans(E, nclust, nstart = 10)$cluster
       separate <- TRUE
       for(i in 1:nclust){
         if(separate){
