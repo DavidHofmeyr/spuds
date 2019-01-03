@@ -20,14 +20,9 @@ kmeanspp <- function(X, k, nstart){
   n <- nrow(X)
   obj_opt <- Inf
   sol_opt <- list()
-  mn <- colMeans(X)
-  C0 <- which.min(distmat(mn, X))
-  ds0 <- distmat(X[C0,], X)
   for(it in 1:nstart){
-    #C <- sample(1:n, 1)
-    #ds <- distmat(X[C,], X)
-    C <- C0
-    ds <- ds0
+    C <- sample(1:n, 1)
+    ds <- distmat(X[C,], X)
     for(i in 2:k){
       C <- c(C, sample(1:n, 1, prob = ds^2/sum(ds^2)))
       drep <- distmat(X[C[i],], X)
