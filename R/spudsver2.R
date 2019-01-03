@@ -14,6 +14,30 @@ squaredists <- function(X){
   C
 }
 
+##### kmeans++ for clustering embedded data
+
+kmeanspp <- function(X, k, nstart){
+  n <- nrow(X)
+  obj_opt <- Inf
+  sol_opt <- list()
+  for(it in 1:nstart){
+    C <- sample(1:n, 1)
+    ds <- distmat(X[C,], X)
+    for(i in 2:k){
+      C <- c(C, sample(1:n, 1, prob = ds^2/sum(ds^2)))
+      drep <- distmat(X[C[i],], X)
+      wrep <- which(drep<ds)
+      ds[wrep] <- drep[wrep]
+    }
+    sol <- kmeans(X, X[C,])
+    if(sol$tot.withinss<obj_opt){
+      obj_opt <- sol$tot.withinss
+      sol_opt <- sol
+    }
+  }
+  sol_opt
+}
+
 #### is.density.separated(...): Determine if a cluster is
 #### separated from the remainder
 #### parameters:
@@ -130,7 +154,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
   if(inherits(e, 'try-error')) e <- eigen(L)$vectors/sqrt(D)
 
   E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-  sol <- kmeans(E, nclust, nstart = 10)$cluster
+  sol <- kmeanspp(E, nclust, nstart = 10)$cluster
 
   ## determine if all non-outlier clusters are separated
   separate <- TRUE
@@ -149,7 +173,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
       nclust <- nclust + cplus
       if(ncol(e)<nclust) e <- eigs_sym(L, min(n, nclust+5*cplus))$vectors/sqrt(D)
       E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-      temp <- kmeans(E, nclust, nstart = 10)$cluster
+      temp <- kmeanspp(E, nclust, nstart = 10)$cluster
 
       if(nclust>cmax){
         sol <- temp
@@ -181,7 +205,7 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
     repeat{
       nclust <- nclust - 1
       E <- e[,1:nclust]/apply(matrix(e[,1:nclust], nrow = n), 1, norm_vec)
-      sol <- kmeans(E, nclust, nstart = 10)$cluster
+      sol <- kmeanspp(E, nclust, nstart = 10)$cluster
       separate <- TRUE
       for(i in 1:nclust){
         if(separate){
