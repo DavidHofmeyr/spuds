@@ -232,14 +232,18 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
   ## considered. As the number of data is few, we are not concerned by this; the
   ## final solutions will not differ substantially.
 
-  outliers <- which(table(sol)<=gam)
-  while(length(outliers)>0){
-    ix1 <- which(sol==outliers[1])
+  #outliers <- which(table(sol)<=gam)
+  #while(length(outliers)>0){
+  while(min(table(sol))<=gam){
+    #ix1 <- which(sol==outliers[1])
+    lab <- which.min(table(sol))
+    ix1 <- which(sol==lab)
     inliers <- (1:n)[-ix1]
     ixa <- inliers[which(matrix(ds[ix1, inliers], nrow = length(ix1))==min(ds[ix1, inliers])[1], arr.ind = TRUE)[1,2]]
     sol[ix1] <- sol[ixa]
-    sol[which(sol>outliers[1])] = sol[which(sol>outliers[1])] - 1
-    outliers <- which(table(sol)<=gam)
+    #sol[which(sol>outliers[1])] = sol[which(sol>outliers[1])] - 1
+    sol[which(sol>lab)] = sol[which(sol>lab)] - 1
+    #outliers <- which(table(sol)<=gam)
   }
   ret = numeric(n)
   for(i in 1:length(unique(sol))) ret[which(sol==unique(sol)[i])] = i
