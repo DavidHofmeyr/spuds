@@ -237,7 +237,8 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
   #while(length(outliers)>0){
   while(min(table(sol))<=gam){
     #ix1 <- which(sol==outliers[1])
-    lab <- which.min(table(sol))
+    counts <- sapply(unique(sol), function(id) sum(sol==id))
+    lab <- unique(sol)[which.min(counts)]
     ix1 <- which(sol==lab)
     inliers <- (1:n)[-ix1]
     ixa <- inliers[which(matrix(ds[ix1, inliers], nrow = length(ix1))==min(ds[ix1, inliers])[1], arr.ind = TRUE)[1,2]]
