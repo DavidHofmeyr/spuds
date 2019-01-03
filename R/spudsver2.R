@@ -68,16 +68,20 @@ is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
     if(sum(sol==sol[ix2])>gam) denthresh <- lam*min(max(den[ixs]), max(den[which(sol==sol[ix2])]))
     else denthresh <- Inf
     if(min(den[ix], den[ix2])>=denthresh){
-      den.path <- numeric(8)
-      ts <- seq(0, 1, length = 10)
-      i = 2
-      while(i <= 9){
-        x <- ts[i]*X[ix,]+(1-ts[i])*X[ix2,]
-        dts <- distmat(x, X)
-        den.path[i-1] <- sum(exp(-dts^2/2/sig^2))
-        if(den.path[i-1] < denthresh) i = 10
-        else i = i + 1
-      }
+      #den.path <- numeric(8)
+      #ts <- seq(0, 1, length = 10)
+      #i = 2
+      #while(i <= 9){
+      #  x <- ts[i]*X[ix,]+(1-ts[i])*X[ix2,]
+      #  dts <- distmat(x, X)
+      #  den.path[i-1] <- sum(exp(-dts^2/2/sig^2))
+      #  if(den.path[i-1] < denthresh) i = 10
+      #  else i = i + 1
+      #}
+      ts <- seq(.1, .9, length = 9)
+      x.path <- ts%*%t(X[ix,]) + (1-ts)%*%t(X[ix2,])
+      d.path <- distmat(x.path, X)
+      den.path <- rowSums(exp(-d.path^2/2/sig^2))
       if(min(den.path)>=denthresh) return(FALSE) ## a path is found
     }
   }
