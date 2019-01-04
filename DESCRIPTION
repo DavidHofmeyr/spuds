@@ -1,12 +1,11 @@
 Package: spuds
 Type: Package
 Title: Spectral Partitioning Using Density Separation
-Version: 1.0
+Version: 1.1
 Author: David Hofmeyr <dhofmeyr@sun.ac.za> [aut, cre]
 Maintainer: David Hofmeyr <dhofmeyr@sun.ac.za>
 Description: Implements the spectral clustering algorithm "SPUDS", introduced in Hofmeyr, D. (2017) "Improving spectral clustering using the asymptotic value of the normalised cut"
-Depends: R (>= 2.10.0)
+Depends: R (>= 2.10.0), rARPACK
 License: GPL-3
 Encoding: UTF-8
 LazyData: no
-Suggests: rARPACK, pracma
