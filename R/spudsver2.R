@@ -14,22 +14,33 @@ squaredists <- function(X){
   C
 }
 
+squaredistmat <- function(X,Y){
+  Xn <- rowSums(X^2)
+  Yn <- rowSums(Y^2)
+  
+  m <- nrow(X)
+  n <- nrow(Y)
+  
+  t(t(-2*X%*%t(Y) + Xn)+Yn)
+}
+
+
 ##### kmeans++ variant for clustering embedded data. Encourages initial centroids far from the overall mean
 
 kmeanspp <- function(X, k, nstart){
   n <- nrow(X)
   obj_opt <- Inf
   sol_opt <- list()
-  mn <- colMeans(X)
-  ds0 <- distmat(mn, X)
+  mn <- matrix(colMeans(X), nrow = 1)
+  ds0 <- squaredistmat(mn, X)
   for(it in 1:nstart){
     ds <- ds0
-    C <- sample(1:n, 1, prob = ds^2)
+    C <- sample(1:n, 1, prob = ds)
     for(i in 2:k){
-      drep <- distmat(X[C[i-1],], X)
+      drep <- squaredistmat(matrix(X[C[i-1],], nrow = 1), X)
       wrep <- which(drep<ds)
       ds[wrep] <- drep[wrep]
-      C <- c(C, sample(1:n, 1, prob = ds^2))
+      C <- c(C, sample(1:n, 1, prob = ds))
     }
     sol <- kmeans(X, X[C,])
     if(sol$tot.withinss<obj_opt){
@@ -72,7 +83,7 @@ is.density.separated <- function(ds, den, ixs, X, sig, lam, sol, gam){
       den.path <- numeric(length(ts))
       i <- 1
       while(i <= length(ts)){
-        den.path[i] <- sum(exp(-distmat(ts[i]*X[ix,]+(1-ts[i])*X[ix2,], X)^2/2/sig^2))
+        den.path[i] <- sum(exp(-squaredistmat(matrix(ts[i]*X[ix,]+(1-ts[i])*X[ix2,], nrow = 1), X)/2/sig^2))
         if(den.path[i] < denthresh) i <- length(ts)+1
         else i <- i + 1
       }
@@ -284,7 +295,7 @@ spuds_datagen = function(nobs, nclust, dim, scale = NULL, curve = NULL){
     }
     if(curve>0){
       for(i in 1:nclust){
-        dmn = distmat(clusts[[i]], MEANS[-i,])
+        dmn = squaredistmat(clusts[[i]], MEANS[-i,])^.5
         mins = apply(dmn, 1, which.min)
         for(l in 1:nrow(clusts[[i]])){
           ws = exp(-dmn[l,]*10)
