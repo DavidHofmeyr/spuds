@@ -256,11 +256,11 @@ spuds <- function(X, c0 = NULL, scale = NULL, sigmult = 1.2, cplus = NULL, cmax 
 
 ### generates data Gaussian mixture and then applies a distortion to the points to create non-convexities in the clusters
 ## params:
-# nits = number of data
+# nobs = number of data
 # nclust = number of clusters
 # dim = number of dimensions
 
-spuds_datagen = function(nits, nclust, dim, scale = NULL, curve = NULL){
+spuds_datagen = function(nobs, nclust, dim, scale = NULL, curve = NULL){
   if(is.null(curve)) curve = dim
   if(is.null(scale)) scale = 1
   data = c()
@@ -276,7 +276,7 @@ spuds_datagen = function(nits, nclust, dim, scale = NULL, curve = NULL){
     ps = runif(nclust)+1
     ps = ps/sum(ps)
     for(i in 1:nclust){
-      ni = ceiling(ps[i]*nits)
+      ni = ceiling(ps[i]*nobs)
       clust = matrix(rnorm(ni*dim), ni, dim)
       clust = t(t(clust)*covs[i,]+MEANS[i,])
       clusts[[i]] = clust
@@ -294,7 +294,7 @@ spuds_datagen = function(nits, nclust, dim, scale = NULL, curve = NULL){
       }
     }
     for(i in 1:nclust) dats = rbind(dats, clusts[[i]])
-    smp = sample(1:length(dats[,1]), nits)
+    smp = sample(1:length(dats[,1]), nobs)
     dats = dats[smp,]
     labs = labs[smp]
 
