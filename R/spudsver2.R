@@ -21,7 +21,9 @@ squaredistmat <- function(X,Y){
   m <- nrow(X)
   n <- nrow(Y)
   
-  t(t(-2*X%*%t(Y) + Xn)+Yn)
+  C <- t(t(-2*X%*%t(Y) + Xn)+Yn)
+  C[which(C<0)] <- 0
+  C
 }
 
 
