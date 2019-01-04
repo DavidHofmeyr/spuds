@@ -1,3 +1,2 @@
-importFrom(pracma, distmat)
 importFrom(rARPACK, eigs_sym)
 export("spuds", "spuds_datagen", "cluster_performance")
