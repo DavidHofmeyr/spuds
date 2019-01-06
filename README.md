@@ -8,3 +8,5 @@ if(!("devtools"%in%installed.packages())) install.packages("devtools")
 devtools::install_github("DavidHofmeyr/spuds")
 
 library(spuds)
+
+help('spuds-package')
